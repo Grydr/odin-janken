@@ -17,13 +17,6 @@ function getComputerChoice() {
     return choice;
 }
 
-function getHumanChoice() {
-    const input = prompt("Choose Rock, Paper, or Scissor (case-insensitive): ");
-
-    let choice = input.toUpperCase();
-    return choice;
-}
-
 function mapChoice(choice) {
     choice = choice.toUpperCase();
 
@@ -42,18 +35,57 @@ function handleWin(flag, humanChoice, computerChoice) {
     // flag 0 = draw
     // flag 1 = human
     // flag 2 = computer
-    console.log("Player played " + humanChoice);
-    console.log("Computer played " + computerChoice);
+
+    // create result div
+    const resContainer = document.querySelector("#res-container");
+    const children = document.querySelectorAll(`#${resContainer.getAttribute("id")} div`);
+    children.forEach(child => {
+        child.remove();
+    });
+    console.log(children);
+
+    // create each player output
+    const playerPlayed = document.createElement("div");
+    const compPlayed = document.createElement("div");
+    const result = document.createElement("div");
+
+    playerPlayed.textContent = "Player played " + humanChoice;
+    compPlayed.textContent = "Computer played " + computerChoice;
 
     if (flag === 0) {
-        console.log("Draw!!");
+        result.textContent = "Draw!!";
     } else if (flag === 1) {
-        console.log("You Win!");
+        result.textContent = "You Win!";
         humanScore++;
     } else if (flag === 2) {
-        console.log("You Lose!");
+        result.textContent = "You Lose!";
         computerScore++;
     }
+
+    // append output to result container
+    resContainer.append(playerPlayed);
+    resContainer.append(compPlayed);
+    resContainer.append(result);
+}
+
+function checkWinner() {
+    const humanScoreDisplay = document.querySelector("#score #player");
+    const computerScoreDisplay = document.querySelector("#score #computer");
+    // console.log("Player Score: " + humanScore);
+    // console.log("Computer Score: " + computerScore);
+
+    if (humanScore === 5) {
+        alert("You Win!");
+        humanScore = 0;
+        computerScore = 0;
+    } else if (computerScore === 5) {
+        alert("You Lose!");
+        humanScore = 0;
+        computerScore = 0;
+    }
+    humanScoreDisplay.textContent = "Player Score: " + humanScore;
+    computerScoreDisplay.textContent = "Computer Score: " + computerScore;
+
 }
 
 function playRound(humanChoice, computerChoice) {
@@ -63,36 +95,38 @@ function playRound(humanChoice, computerChoice) {
 
     if (humanMapped === computerMapped) {
         handleWin(0, humanChoice, computerChoice);
-    } else if (humanMapped === 0 && computerMapped === 1) {
+    } else if ((humanMapped === 0 && computerMapped === 1) ||
+        (humanMapped === 1 && computerMapped === 2) ||
+        (humanMapped === 2 && computerMapped === 0)) {
         handleWin(2, humanChoice, computerChoice);
-    } else if (humanMapped === 0 && computerMapped === 2) {
-        handleWin(1, humanChoice, computerChoice);
-    } else if (humanMapped === 1 && computerMapped === 0) {
-        handleWin(1, humanChoice, computerChoice);
-    } else if (humanMapped === 1 && computerMapped === 2) {
-        handleWin(2, humanChoice, computerChoice);
-    } else if (humanMapped === 2 && computerMapped === 0) {
-        handleWin(2, humanChoice, computerChoice);
-    } else if (humanMapped === 2 && computerMapped === 1) {
+    } else if ((humanMapped === 0 && computerMapped === 2) ||
+        (humanMapped === 1 && computerMapped === 0) ||
+        (humanMapped === 2 && computerMapped === 1)) {
         handleWin(1, humanChoice, computerChoice);
     }
+
+    checkWinner();
 }
 
-function playGame(numPlay) {
-    for (let i = 0; i < numPlay; i++) {
-        playRound(getHumanChoice(), getComputerChoice());
-    }
+function playGame() {
+    const container = document.querySelector("#btn-container");
 
-    console.log("Player Score: " + humanScore);
-    console.log("Computer Score: " + computerScore);
+    let choice = "";
+    container.addEventListener("click", (event) => {
+        switch (event.target.id) {
+            case "rock-btn":
+                choice = "ROCK";
+                break;
+            case "paper-btn":
+                choice = "PAPER";
+                break;
+            case "scissor-btn":
+                choice = "SCISSOR";
+                break;
+        }
+        playRound(choice, getComputerChoice());
+    });
 
-    if (humanScore === computerScore) {
-        console.log("Draw!");
-    } else if (humanScore > computerScore) {
-        console.log("Player Win!!");
-    } else if (humanScore < computerScore) {
-        console.log("Computer Win!!");
-    }
 }
 
-playGame(5);
+playGame();
